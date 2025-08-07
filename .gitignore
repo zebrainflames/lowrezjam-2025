@@ -1,0 +1,34 @@
+#NOTE:in my typical project setup, the dr-types repo is configured as a submodule in git, so we do _not_ usually ignore it
+# dr-types/
+
+##
+dragonruby-yard-doc/*
+
+# build information that is not needed:
+mygame/errors/*
+# prefer building dlls locally or in CI instead.
+mygame/native/*
+
+# Ignore all DragonRuby runtime related folders, to avoid pushing copyrighted material
+.dragonruby
+docs
+include
+logs
+samples
+tmp
+CHANGELOG-PREV.txt
+CHANGELOG-CURR.txt
+console-logo.png
+#ctags-vim <-- this is public source
+ctags-emacs
+dragonruby-bind.exe
+dragonruby-httpd.exe
+dragonruby.exe
+dragonruby-publish.exe
+dragonruby.png
+dragonruby-controller.png
+eula.txt
+font.ttf
+open-source-licenses.txt
+README.txt
+VERSION.txt

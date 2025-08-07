@@ -1,0 +1,169 @@
+# inspired by various gists online and updated to match personal style prefs
+# jhkroger -- 2025-07-06
+
+# GEMINI: Require the performance cops and enable new cops from RuboCop updates.
+require:
+  - rubocop-performance
+
+AllCops:
+  NewCops: enable
+  Include:
+    - 'mygame/app/*'
+  Exclude:
+    - 'mygame/**'
+    - '.dragonruby/**/*'
+    - 'dr-types/*'
+    - 'docs/**/*'
+    - 'include/**/*'
+    - 'samples/**/*'
+    - 'tmp/**/*'
+
+# This should just match whatever you have in the editor of choice.
+Layout/LineLength:
+  Max: 120
+
+# --- Metrics ---
+
+# rubocop defaults for method lenght are useless for performance oriented code
+Metrics/MethodLength:
+  Max: 120
+
+# The guiding principle of classes is SRP, SRP can't be accurately measured by LoC
+Metrics/ClassLength:
+  Max: 1500
+
+# GEMINI: Disabled. This cop often penalizes procedural or data-transformation
+# code. Disabling it aligns with your goal of a more flexible style.
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/ParameterLists:
+  Enabled: false
+
+# --- Layout and Style ---
+
+Layout/SpaceAroundKeyword:
+  Enabled: true
+
+Layout/SpaceAroundBlockParameters:
+  EnforcedStyleInsidePipes: no_space
+
+Layout/SpaceAroundOperators:
+  EnforcedStyleForRationalLiterals: space
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+Style/SymbolArray:
+  EnforcedStyle: percent
+
+Layout/HashAlignment:
+  EnforcedHashRocketStyle: table
+  EnforcedColonStyle: table
+
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+
+Style/PreferredHashMethods:
+  Enabled: false
+
+# GEMINI: Enabled as requested. String#% is a good choice for performance
+# and provides a clear, object-oriented API.
+Style/FormatString:
+  EnforcedStyle: percent
+
+Style/CollectionMethods:
+  Enabled: true
+  PreferredMethods:
+    reduce: "reduce" # reduce just fits better for the modern style
+
+# we don't care; no parens is more readable
+Style/MethodDefParentheses:
+  Enabled: false
+  # EnforcedStyle: require_parentheses
+
+# --- Control Flow and Conditionals ---
+
+Style/ParenthesesAroundCondition:
+  Enabled: false
+
+# GEMINI: Changed to allow safe assignment (e.g., `if (line = file.gets)`).
+# This is a powerful and common pattern for procedural file/stream processing.
+Lint/AssignmentInCondition:
+  AllowSafeAssignment: true
+
+# --- Exceptions ---
+
+Style/RaiseArgs:
+  Enabled: false
+
+Style/SignalException:
+  EnforcedStyle: only_raise
+
+# GEMINI: FIX - The previous setting `Enabled: true` would flag suppressed
+# exceptions. Your comment indicates you want to *allow* them. Setting
+# `Enabled: false` achieves this.
+Lint/SuppressedException:
+  Enabled: false
+
+# --- Blocks and Methods ---
+
+Layout/DotPosition:
+  Enabled: false
+
+Layout/SpaceInsideBlockBraces:
+  SpaceBeforeBlockParameters: true
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/MethodCalledOnDoEndBlock:
+  Enabled: true
+
+Style/SingleLineBlockParams:
+  Enabled: false
+
+Lint/ShadowingOuterLocalVariable:
+  Enabled: false
+
+Naming/MethodParameterName:
+  Enabled: false
+
+#
+
+# --- General ---
+
+Style/Documentation:
+  Enabled: false
+
+Naming/BinaryOperatorParameterName:
+  Enabled: false
+
+Lint/Debugger:
+  Enabled: true
+
+# --- Performance and Allocations (Powered by rubocop-performance) ---
+# The `require: rubocop-performance` at the top enables all performance cops.
+# The following are key configurations for your goals.
+
+# GEMINI: This is the single most impactful change for reducing string allocations.
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+# GEMINI: Enforces `sum` over `inject(:+)` for numeric sums, which is faster.
+# This is a good trade-off against the general `reduce: 'inject'` preference.
+Performance/Sum:
+  Enabled: true
+
+# GEMINI: Enforces faster string replacement methods like `tr` over `gsub`.
+Performance/StringReplacement:
+  Enabled: true
+
+# GEMINI: Prevents creating unnecessary intermediate arrays in chained calls.
+Performance/ChainArrayAllocation:
+  Enabled: true
+
+# GEMINI: Prevents allocating new arrays/hashes on every loop iteration.
+Performance/CollectionLiteralInLoop:
+  Enabled: true
