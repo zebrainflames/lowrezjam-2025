@@ -1,0 +1,64 @@
+module GTK
+  class Args
+    def state: -> GameState
+    def lowrez: -> LowrezOutputs
+    def inputs: -> Inputs
+  end
+end
+
+class Inputs
+  def keyboard: -> Keyboard
+end
+
+class Keyboard
+  # DragonRuby returns a vector-like object with x/y or nil when no input.
+  def directional_vector: -> Vec2?
+end
+
+class Vec2
+  attr_reader x: Numeric
+  attr_reader y: Numeric
+end
+
+class GameState
+  attr_accessor player: Player
+  attr_accessor enemies: Array[Enemy]
+  attr_accessor ticks_since_spawn: Integer
+  attr_accessor initialized: bool
+end
+
+class Player
+  attr_accessor x: Numeric
+  attr_accessor y: Numeric
+  attr_accessor w: Numeric
+  attr_accessor h: Numeric
+  attr_accessor flip_horizontally: bool
+end
+
+class Enemy
+  attr_accessor x: Numeric
+  attr_accessor y: Numeric
+  attr_accessor w: Numeric
+  attr_accessor h: Numeric
+  attr_accessor health: Integer
+end
+
+module Geometry
+  def self.vec2_normalize: ({ x: Numeric, y: Numeric }) -> { x: Numeric, y: Numeric }
+end
+
+class LowrezOutputs
+  # Queues for low-res rendering (DragonRuby render targets). These are arrays of primitives (hash-like).
+  def solids: -> Array[Hash[untyped, untyped]]
+  def borders: -> Array[Hash[untyped, untyped]]
+  def sprites: -> Array[Hash[untyped, untyped]]
+  def labels: -> Array[Hash[untyped, untyped]]
+  def lines: -> Array[Hash[untyped, untyped]]
+  def primitives: -> Array[Hash[untyped, untyped]]
+
+  # Background color: RGB(A) values; setter updates window and lowrez background.
+  attr_accessor background_color: Array[Integer]
+
+  # Default label hash used by app/lowrez.rb convenience API.
+  def default_label: -> { x: Integer, y: Integer, text: String, size_enum: Numeric, alignment_enum: Integer, r: Integer, g: Integer, b: Integer, a: Integer, font: String }
+end

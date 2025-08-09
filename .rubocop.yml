@@ -2,7 +2,7 @@
 # jhkroger -- 2025-07-06
 
 # GEMINI: Require the performance cops and enable new cops from RuboCop updates.
-require:
+plugins:
   - rubocop-performance
 
 AllCops:
@@ -79,8 +79,14 @@ Style/CollectionMethods:
 
 # we don't care; no parens is more readable
 Style/MethodDefParentheses:
+  Enabled: true
+  EnforcedStyle: require_no_parentheses
+
+# Allow multiple assignment and parallel assignment
+Style/ParallelAssignment:
   Enabled: false
-  # EnforcedStyle: require_parentheses
+Layout/MultilineAssignmentLayout:
+  Enabled: false
 
 # --- Control Flow and Conditionals ---
 

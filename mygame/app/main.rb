@@ -1,126 +1,41 @@
-require 'app/lowrez.rb'
+require 'app/lowrez'
+
+require_relative 'render'
+require_relative 'gameplay'
 
 def tick args
-  # How to set the background color
-  args.lowrez.background_color = [120, 120, 120]
+  ## === INIT ===
+  unless args.state.initialized
+    args.state.player = { x: 0, y: 0, w: 8, h: 8 }
+    args.state.enemies = []
+    args.state.weapons = []
+    args.state.weapons << create_axe_weapon
+    args.state.initialized = true
+  end
 
-  # Invoke the hello_world subroutine/method
-  # hello_world args # <---- add a "#" to the beginning of the line to stop running this subroutine/method.
-  # =======================================================================
+  ## === UPDATE ===
 
-  # == HOW TO RENDER A SPRITE =============================================
-  # Remove the "#" at the beginning of the line below
-  # how_to_render_sprites args
-  # =======================================================================
+  update_player args
 
+  update_enemies args
 
-  # ==== HOW TO MOVE A SPRITE BASED OFF OF USER INPUT =====================
-  # Remove the "#" at the beginning of the line below
-  # how_to_move_a_sprite args
-  # =======================================================================
+  update_weapons args
 
+  update_effects args
 
-  # ==== HOW TO ANIMATE A SPRITE (SEPERATE PNGS) ==========================
-  # Remove the "#" at the beginning of the line below
-  # how_to_animate_a_sprite args
-  # =======================================================================
+  ## === RENDER ===
+  args.lowrez.background_color = [34, 32, 52]
 
+  render_player args
 
-  # ==== HOW TO ANIMATE A SPRITE (SPRITE SHEET) ===========================
-  # Remove the "#" at the beginning of the line below
-  # how_to_animate_a_sprite_sheet args
-  # =======================================================================
+  args.state.enemies.each { |g| render_goblin args, g }
 
+  # Render transient attack effects on top of characters
+  render_attack_fx args
 
-  # ==== HOW TO DETERMINE COLLISION =============================================
-  # Remove the "#" at the beginning of the line below
-  how_to_determine_collision args
-  # =======================================================================
+  blit_label(args: args, x: 16, y: 10, text: "+1 STR")
 
-
-  # ==== HOW TO CREATE BUTTONS ==================================================
-  # Remove the "#" at the beginning of the line below
-  # how_to_create_buttons args
-  # =======================================================================
-
-
-  # ==== The line below renders a debug grid, mouse information, and current tick
   render_debug args
-end
-
-def hello_world args
-  args.lowrez.solids  << { x: 0, y: 0, w: 1, h: 10, r: 255 }
-
-  args.lowrez.labels  << {
-    x: 32,
-    y: 63,
-    text: "lowrezjam 2020",
-    size_enum: LOWREZ_FONT_SM,
-    alignment_enum: 1,
-    r: 0,
-    g: 0,
-    b: 0,
-    a: 255,
-    font: LOWREZ_FONT_PATH
-  }
-
-  args.lowrez.sprites << {
-    x: 32 - 10,
-    y: 32 - 10,
-    w: 20,
-    h: 20,
-    path: 'sprites/lowrez-ship-blue.png',
-    a: Kernel.tick_count % 255,
-    angle: Kernel.tick_count % 360
-  }
-end
-
-
-# =======================================================================
-# ==== HOW TO RENDER A LABEL ============================================
-# =======================================================================
-def how_to_render_a_label args
-  # NOTE: Text is aligned from the TOP LEFT corner
-
-  # Render an EXTRA LARGE/XL label (remove the "#" in front of each line below)
-  args.lowrez.labels << { x: 0, y: 57, text: "Hello World",
-                          size_enum: LOWREZ_FONT_XL,
-                          r: 0, g: 0, b: 0, a: 255,
-                          font: LOWREZ_FONT_PATH }
-
-  # Render a LARGE/LG label (remove the "#" in front of each line below)
-  args.lowrez.labels << { x: 0, y: 36, text: "Hello World",
-                          size_enum: LOWREZ_FONT_LG,
-                          r: 0, g: 0, b: 0, a: 255,
-                          font: LOWREZ_FONT_PATH }
-
-  # Render a MEDIUM/MD label (remove the "#" in front of each line below)
-  args.lowrez.labels << { x: 0, y: 20, text: "Hello World",
-                          size_enum: LOWREZ_FONT_MD,
-                          r: 0, g: 0, b: 0, a: 255,
-                          font: LOWREZ_FONT_PATH }
-
-  # Render a SMALL/SM label (remove the "#" in front of each line below)
-  args.lowrez.labels << { x: 0, y: 9, text: "Hello World",
-                          size_enum: LOWREZ_FONT_SM,
-                          r: 0, g: 0, b: 0, a: 255,
-                          font: LOWREZ_FONT_PATH }
-
-  # You are provided args.lowrez.default_label which returns a Hash that you
-  # can ~merge~ properties with
-  # Example 1
-  args.lowrez.labels << args.lowrez
-                            .default_label
-                            .merge(text: "Default")
-
-  # Example 2
-  args.lowrez.labels << args.lowrez
-                            .default_label
-                            .merge(x: 31,
-                                   text: "Default",
-                                   r: 128,
-                                   g: 128,
-                                   b: 128)
 end
 
 ## # =============================================================================

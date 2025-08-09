@@ -157,7 +157,7 @@ module GTK
 
       @args.outputs
            .sprites << { x: 320,
-                         y: 20,
+                         y: 40,
                          w: 640,
                          h: 640,
                          source_x: 0,

@@ -1,3 +1,5 @@
 include:
   - "mygame/app/*.rb"
   - "../dragonruby-yard-doc/*.rb"
+  - "types/*"
+  - "dr-types/*"
