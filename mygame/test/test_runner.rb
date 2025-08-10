@@ -38,3 +38,25 @@ def test_axe_autoattack_damages_enemy args, assert
   # Assert: ticks_since_attack should have reset to 0 after attacking
   assert.equal! axe[:ticks_since_attack], 0, 'weapon attack timer should reset after attack.'
 end
+
+# Enemies should not move into each other: update_enemies limits movement to avoid overlap.
+def test_enemies_do_not_overlap_after_update args, assert
+  # Arrange: player at center; two enemies on a collision course.
+  args.state.player = { x: 32.0, y: 32.0, w: 8, h: 7 }
+  args.state.enemies = [
+    { x: 20.0, y: 20.0, w: 4, h: 4, health: 10 },
+    { x: 26.5, y: 26.5, w: 4, h: 4, health: 10 }
+  ]
+  # Ensure no spawn during test
+  args.state.ticks_since_spawn = 0
+
+  # Act
+  update_enemies args
+
+  # Assert: no overlaps among enemies
+  e1, e2 = args.state.enemies
+  assert.false! e1.intersect_rect?(e2), 'enemies should not overlap after movement.'
+  # And at least one enemy should have moved (not both fully blocked)
+  moved_any = (e1.x != 20.0 || e1.y != 20.0) || (e2.x != 26.5 || e2.y != 26.5)
+  assert.true! moved_any, 'at least one enemy should be able to move when space permits.'
+end

@@ -1,5 +1,6 @@
-# inspired by various gists online and updated to match personal style prefs
-# jhkroger -- 2025-07-06
+# Inspired by various gists online and heavily modified to better match a more data-oriented & procedural style of Ruby
+# that's pleasant to work with with decent performance for game logic code and scripting.
+# -- ZebraInFlames -- Summer 2025
 
 # GEMINI: Require the performance cops and enable new cops from RuboCop updates.
 plugins:
@@ -22,26 +23,34 @@ AllCops:
 Layout/LineLength:
   Max: 120
 
-# --- Metrics ---
-
-# rubocop defaults for method lenght are useless for performance oriented code
+# Metrics -- Lenght metrics; these are somewhat reasonable as metrics, but the default values are way too low.
+# Rubocop defaults for method lenght are useless for performance oriented code
 Metrics/MethodLength:
   Max: 120
-
 # The guiding principle of classes is SRP, SRP can't be accurately measured by LoC
 Metrics/ClassLength:
   Max: 1500
+Metrics/BlockLength:
+  Max: 150
 
-# GEMINI: Disabled. This cop often penalizes procedural or data-transformation
-# code. Disabling it aligns with your goal of a more flexible style.
+# NOTE: We disable a lot of useless 'style-oriented' Metrics, that are known to not improve code quality. Do not know
+# why Rubocop cares about them. E.g cyclomatic complexity is an idiotic metric that does not make sense for any sort of
+# code as a continuous measure - at least in the default values (so we bump it up considerably).
 Metrics/AbcSize:
   Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: true
+  Max: 30
+
+Metrics/PerceivedComplexity:
+  Enabled: true
+  Max: 30
 
 Metrics/ParameterLists:
   Enabled: false
 
 # --- Layout and Style ---
-
 Layout/SpaceAroundKeyword:
   Enabled: true
 
@@ -67,17 +76,20 @@ Style/HashSyntax:
 Style/PreferredHashMethods:
   Enabled: false
 
-# GEMINI: Enabled as requested. String#% is a good choice for performance
-# and provides a clear, object-oriented API.
+# We don't care about method names versus logical operators
+Style/NumericPredicate:
+  Enabled: false
+
+# String#% is a good choice for performance and provides a clear, object-oriented API.
 Style/FormatString:
   EnforcedStyle: percent
 
 Style/CollectionMethods:
   Enabled: true
   PreferredMethods:
-    reduce: "reduce" # reduce just fits better for the modern style
+    reduce: "reduce"
 
-# we don't care; no parens is more readable
+# We don't really care; no parens is more pleasant to read; this is a fully personal preference.
 Style/MethodDefParentheses:
   Enabled: true
   EnforcedStyle: require_no_parentheses
@@ -89,31 +101,25 @@ Layout/MultilineAssignmentLayout:
   Enabled: false
 
 # --- Control Flow and Conditionals ---
-
 Style/ParenthesesAroundCondition:
   Enabled: false
 
-# GEMINI: Changed to allow safe assignment (e.g., `if (line = file.gets)`).
-# This is a powerful and common pattern for procedural file/stream processing.
+# This is common enough in safe assignments that it makes sense to allow it.
 Lint/AssignmentInCondition:
   AllowSafeAssignment: true
 
 # --- Exceptions ---
-
+# TODO: this section should be reviewed.
 Style/RaiseArgs:
   Enabled: false
 
 Style/SignalException:
   EnforcedStyle: only_raise
 
-# GEMINI: FIX - The previous setting `Enabled: true` would flag suppressed
-# exceptions. Your comment indicates you want to *allow* them. Setting
-# `Enabled: false` achieves this.
 Lint/SuppressedException:
   Enabled: false
 
 # --- Blocks and Methods ---
-
 Layout/DotPosition:
   Enabled: false
 
@@ -135,10 +141,7 @@ Lint/ShadowingOuterLocalVariable:
 Naming/MethodParameterName:
   Enabled: false
 
-#
-
 # --- General ---
-
 Style/Documentation:
   Enabled: false
 
@@ -147,7 +150,6 @@ Naming/BinaryOperatorParameterName:
 
 Lint/Debugger:
   Enabled: true
-
 # --- Performance and Allocations (Powered by rubocop-performance) ---
 # The `require: rubocop-performance` at the top enables all performance cops.
 # The following are key configurations for your goals.
