@@ -4,17 +4,19 @@
 ### Available tasks:
 ### - run: Run the DragonRuby game
 ### - test: Run all tests
+### - build: Package distributable builds using dragonruby-publish
 
 task default: :run
 
+# Runs the DragonRuby engine. Working dir should be repo root; game folder is `mygame`.
 task :run do
   dragon_exec = lambda do
     plat = RUBY_PLATFORM
     puts "Ruby platform is #{plat}"
     if /mswin|mingw|cygwin/.match?(plat)
-      'dragonruby.exe'
+      'dragonruby.exe mygame'
     else
-      'dragonruby'
+      './dragonruby mygame'
     end
   end
 
@@ -29,7 +31,11 @@ namespace :test do
     puts 'Running all DragonRuby tests'
     # NOTE: dragonruby does not currently support providing a full list of individual test files, so we need to use a
     # separate test runner script for orchestration.
-    test_command = 'dragonruby.exe mygame --test test/test_runner.rb --quit-after-test'
+    test_command = if /mswin|mingw|cygwin/.match?(RUBY_PLATFORM)
+                     'dragonruby.exe mygame --test test/test_runner.rb --quit-after-test'
+                   else
+                     './dragonruby mygame --test test/test_runner.rb --quit-after-test'
+                   end
     puts "Executing: #{test_command}"
 
     # We use backticks to capture output and then `puts` it for viewing.
@@ -52,11 +58,42 @@ namespace :test do
       abort "\n❌ DragonRuby tests FAILED: #{failed_count} of #{total_count} test(s) failed, #{inconclusive_count} inconclusive!"
     end
   end
-
 end
 
-## Top-level aliases for convenience
+namespace :build do
+  desc 'Package distributable builds using dragonruby-publish (does NOT upload).'
+  task :package do # TODO: can we mark builds generated as 'file tasks', i.e use default Rake tooling to avoid rebuilding when it's not needed?
+    puts 'Packaging builds with dragonruby-publish (no upload)'
+    publish_cmd = if /mswin|mingw|cygwin/.match?(RUBY_PLATFORM)
+                    'dragonruby-publish.exe --package mygame'
+                  else
+                    './dragonruby-publish --package mygame'
+                  end
+    puts "Executing: #{publish_cmd}"
+
+    output = `#{publish_cmd}`
+    puts output
+
+    # dragonruby-publish writes status lines; we consider non-zero exit status or keywords as failure signals if present
+    # but since backticks swallow exit code, we heuristically check for common failure markers.
+    if $?.exitstatus != 0 || output =~ /(ERROR|Error|Failed|failed|ABORT|Abort)/
+      abort "\n❌ Packaging failed. See output above."
+    else
+      puts "\n✅ Packaging completed. Builds should be under ./build"
+    end
+  end
+
+  desc 'Deploy builds to itch.io using dragonruby-publish'
+  task publish: :package do
+    puts 'TODO: this task is not yet implemented.'
+  end
+end
+
+# Top-level convenience tasks
 
 desc 'Run all DragonRuby Ruby-side unit tests and integration tests (alias for test:ruby)'
 task test: 'test:ruby'
+
+desc 'Package distributable builds using dragonruby-publish (alias for build:package)'
+task build: 'build:package'
 

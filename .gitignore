@@ -8,6 +8,9 @@ dragonruby-yard-doc/*
 mygame/errors/*
 # prefer building dlls locally or in CI instead.
 mygame/native/*
+# packaging & publishing related tasks
+builds/
+
 
 # Ignore all DragonRuby runtime related folders, to avoid pushing copyrighted material
 .dragonruby
